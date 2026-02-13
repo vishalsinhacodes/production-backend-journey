@@ -131,3 +131,110 @@ This ensures database data is not lost when containers restart.
 - Each service runs in its own container.
 - Services communicate using service names.
 - `localhost` inside container refers to the container itself.
+
+---
+
+## Architecture Overview
+
+- FastAPI application (Dockerized)
+- PostgreSQL database (Dockerized)
+- Multi-container orchestration using Docker Compose
+- Environment variable configuration using .env
+- Persistent database volume
+
+# Docker Deep Dive – Container Inspection
+
+## Viewing Running Containers
+
+Command:
+docker ps
+
+Shows:
+
+- Container ID
+- Image name
+- Port mappings
+- Running status
+
+---
+
+## Viewing Container Logs
+
+Command:
+docker logs <container_name>
+
+Examples:
+docker logs backend-app
+docker logs postgres-db
+
+Logs help debug:
+
+- Startup errors
+- Database connection failures
+- Runtime exceptions
+
+---
+
+## Executing Commands Inside a Container
+
+Command:
+docker exec -it <container_name> sh
+
+Example:
+docker exec -it backend-app sh
+
+This opens an interactive shell inside the container.
+
+Use cases:
+
+- Inspect file structure
+- Debug environment variables
+- Check installed packages
+- Run internal commands
+
+Exit container shell:
+exit
+
+---
+
+## Docker Networks
+
+List networks:
+docker network ls
+
+Inspect network:
+docker network inspect <network_name>
+
+Docker Compose automatically creates a private network.
+All services inside docker-compose.yml share this network.
+
+Containers communicate using service names.
+
+Example:
+Database hostname = db
+Not localhost.
+
+---
+
+## Docker Volumes
+
+List volumes:
+docker volume ls
+
+Inspect volume:
+docker volume inspect postgres_data
+
+Volumes store persistent data outside containers.
+
+In our setup:
+postgres_data → stores PostgreSQL data
+
+This ensures data survives container restarts.
+
+## Operational Knowledge Gained
+
+- Container lifecycle management
+- Multi-container networking
+- Service-to-service communication
+- Volume persistence handling
+- Container inspection and debugging
