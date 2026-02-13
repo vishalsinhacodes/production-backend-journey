@@ -62,3 +62,72 @@ docker rm backend-container
 ## Remove Image
 
 docker rmi backend-app
+
+---
+
+# Multi-Container Setup with Docker Compose
+
+## Why Docker Compose?
+
+Docker Compose allows us to run multiple services (app + database) together using a single configuration file.
+
+---
+
+## docker-compose.yml Overview
+
+We defined two services:
+
+1. db → PostgreSQL container
+2. app → FastAPI container
+
+They communicate using Docker's internal network via service name.
+
+Example:
+DATABASE_URL=postgresql://postgres:<password>@db:5432/backend_db
+
+Note:
+Inside Docker, 'localhost' does NOT refer to the host machine.
+Containers communicate using service names (e.g., db).
+
+---
+
+## Important Commands
+
+Start services (with rebuild):
+docker compose up --build
+
+Start services (without rebuild):
+docker compose up
+
+Stop services:
+docker compose down
+
+Check running services:
+docker compose ps
+
+---
+
+## Environment Variables
+
+We moved credentials into a `.env` file for better practice.
+
+`.env` is excluded from Git using `.gitignore`.
+
+This prevents secret leakage.
+
+---
+
+## Volume Persistence
+
+PostgreSQL uses a named volume:
+postgres_data:/var/lib/postgresql/data
+
+This ensures database data is not lost when containers restart.
+
+---
+
+## Networking Concept
+
+- Each service runs in its own container.
+- Services communicate using service names.
+- `localhost` inside container refers to the container itself.
