@@ -1,3 +1,17 @@
+## Architecture Overview
+
+- FastAPI application (Dockerized)
+- PostgreSQL database (Dockerized)
+- Multi-container orchestration using Docker Compose
+- Environment variable configuration using .env
+- Persistent database volume
+- Container lifecycle management
+- Multi-container networking
+- Service-to-service communication
+- Volume persistence handling
+- Container inspection and debugging
+- Optimized Docker image using .dockerignore and layered builds
+
 # Docker Basics – Week 1
 
 ## Build Image
@@ -134,14 +148,6 @@ This ensures database data is not lost when containers restart.
 
 ---
 
-## Architecture Overview
-
-- FastAPI application (Dockerized)
-- PostgreSQL database (Dockerized)
-- Multi-container orchestration using Docker Compose
-- Environment variable configuration using .env
-- Persistent database volume
-
 # Docker Deep Dive – Container Inspection
 
 ## Viewing Running Containers
@@ -231,14 +237,6 @@ postgres_data → stores PostgreSQL data
 
 This ensures data survives container restarts.
 
-## Operational Knowledge Gained
-
-- Container lifecycle management
-- Multi-container networking
-- Service-to-service communication
-- Volume persistence handling
-- Container inspection and debugging
-
 ## Startup Resilience
 
 Added retry logic to ensure app waits for database readiness.
@@ -247,3 +245,53 @@ Reason:
 depends_on only controls startup order, not service readiness.
 
 Implemented retry mechanism with exponential attempts before failure.
+
+---
+
+# Image Optimization
+
+## Why Use .dockerignore?
+
+The .dockerignore file prevents unnecessary files from being copied into the Docker image.
+
+Ignored:
+
+- venv
+- .git
+- .env
+- docs
+- cache files
+
+This reduces:
+
+- Image size
+- Build time
+- Security exposure
+
+---
+
+## Improved Dockerfile Strategy
+
+We optimized the Dockerfile by:
+
+1. Copying requirements.txt first
+   → Enables Docker layer caching.
+   → Dependencies don’t reinstall unless requirements change.
+
+2. Copying only the app directory instead of entire project.
+
+This makes builds faster and images cleaner.
+
+---
+
+## Image Size Consideration
+
+Initial image size: ~350MB  
+Optimized image size: ~270MB
+
+Python base image contributes significantly to size.
+
+Further reduction possible via:
+
+- Multi-stage builds
+- Minimal base images
