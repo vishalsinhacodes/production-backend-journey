@@ -1,8 +1,14 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from contextlib import contextmanager
 
-DATABASE_URL = "postgresql://postgres:admin123@localhost:5432/backend_db"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres:admin123@localhost:5432/backend_db"
+)
+# DATABASE_URL = "postgresql://postgres:admin123@db:5432/backend_db"
 
 engine = create_engine(DATABASE_URL)
 
