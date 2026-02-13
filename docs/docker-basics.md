@@ -1,17 +1,3 @@
-## Architecture Overview
-
-- FastAPI application (Dockerized)
-- PostgreSQL database (Dockerized)
-- Multi-container orchestration using Docker Compose
-- Environment variable configuration using .env
-- Persistent database volume
-- Container lifecycle management
-- Multi-container networking
-- Service-to-service communication
-- Volume persistence handling
-- Container inspection and debugging
-- Optimized Docker image using .dockerignore and layered builds
-
 # Docker Basics – Week 1
 
 ## Build Image
