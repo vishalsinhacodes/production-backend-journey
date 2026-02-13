@@ -238,3 +238,12 @@ This ensures data survives container restarts.
 - Service-to-service communication
 - Volume persistence handling
 - Container inspection and debugging
+
+## Startup Resilience
+
+Added retry logic to ensure app waits for database readiness.
+
+Reason:
+depends_on only controls startup order, not service readiness.
+
+Implemented retry mechanism with exponential attempts before failure.
