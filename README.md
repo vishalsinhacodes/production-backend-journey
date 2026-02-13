@@ -7,3 +7,7 @@ Week 1:
 
 - FastAPI basic app
 - Health endpoint
+
+## Documentation
+
+- See docs/docker-basics.md
