@@ -2,11 +2,9 @@ import os
 import json
 import re
 from openai import OpenAI
-
 from dotenv import load_dotenv
 
-
-load_dotenv()
+from app.config import *
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 AI_MODEL_NAME = os.getenv("AI_MODEL_NAME", "llama-3.1-8b-instant")
