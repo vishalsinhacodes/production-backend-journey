@@ -28,6 +28,14 @@ Week 1:
 - Docker image automatically built on each push
 - Ensures build integrity
 
+## Cloud Deployment
+
+- Deployed Dockerized backend to AWS EC2
+- Pulled image from Docker Hub (CI-built)
+- Multi-container deployment with PostgreSQL
+- Public endpoint verification
+- Infrastructure cleanup verification
+
 ## Documentation
 
 - See docs/docker-basics.md
