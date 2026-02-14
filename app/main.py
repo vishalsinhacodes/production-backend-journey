@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from .database import engine, get_db
 from .models import Base, User
-from .ai_service import chat_with_ai
+from .ai_service import chat_with_ai, summarize_document
 from pydantic import BaseModel
 
 
@@ -38,3 +38,19 @@ def ai_chat(request: ChatRequest):
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+class SummarizeRequest(BaseModel):
+    text: str
+    
+class SummarizeResponse(BaseModel):
+    summary: str
+    key_points: list[str]
+    action_items: list[str]
+    
+@app.post("/ai/summarize", response_model=SummarizeResponse)
+def summerize(request: SummarizeRequest):
+    try:
+        result = summarize_document(request.text)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))        

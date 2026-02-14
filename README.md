@@ -1,7 +1,7 @@
 # Production Backend Journey
 
 Goal:
-To build production-ready backend systems with Docker, CI/CD, and Cloud deployment.
+To build production-ready backend systems with Docker, CI/CD, Cloud deployment and AI Integration.
 
 Week 1:
 
