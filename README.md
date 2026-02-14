@@ -36,6 +36,14 @@ Week 1:
 - Public endpoint verification
 - Infrastructure cleanup verification
 
+## AI Integration
+
+- Integrated Groq (OpenAI-compatible) LLM
+- Config-driven model selection
+- Environment-based API key handling
+- Production-style error propagation
+- Docker and cloud compatible
+
 ## Documentation
 
 - See docs/docker-basics.md
