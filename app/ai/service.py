@@ -1,8 +1,9 @@
 import os
 import json
 import re
-from openai import OpenAI
+from openai import OpenAI, APITimeoutError
 from dotenv import load_dotenv
+
 
 from app.config import *
 
@@ -15,20 +16,24 @@ if not GROQ_API_KEY:
 
 client = OpenAI(
     api_key=GROQ_API_KEY,
-    base_url="https://api.groq.com/openai/v1"
+    base_url="https://api.groq.com/openai/v1",
+    timeout=10.0
 )
 
 def chat_with_ai(user_message: str) -> str:
-    completion = client.chat.completions.create(
-        model=AI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content":"You are a helpful AI assistant."},
-            {"role": "user", "content": user_message}
-        ],
-        temperature=AI_TEMPERATURE
-    )
-    
-    return completion.choices[0].message.content
+    try:
+        completion = client.chat.completions.create(
+            model=AI_MODEL_NAME,
+            messages=[
+                {"role": "system", "content":"You are a helpful AI assistant."},
+                {"role": "user", "content": user_message}
+            ],
+            temperature=AI_TEMPERATURE
+        )
+        
+        return completion.choices[0].message.content
+    except APITimeoutError:
+        raise Exception("AI Service timeout.")
 
 def summarize_document(text: str) -> dict:
     prompt = f"""
@@ -43,23 +48,26 @@ def summarize_document(text: str) -> dict:
     Document:
     {text}
     """
-    completion = client.chat.completions.create(
-        model=AI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a structured summarization assistant."},
-            {"role": "user", "content": prompt}                
-        ],
-        temperature=AI_TEMPERATURE,
-    )
-    
-    content = completion.choices[0].message.content.strip()
-    
-    # Extract JSON block if extra text exists
-    json_match = re.search(r"\{.*\}", content, re.DOTALL)
-    if not json_match:
-        raise Exception("No valid JSON found in AI response.")
-    
     try:
-        return json.loads(json_match.group())
-    except json.JSONDecodeError:
-        raise Exception("Failed to parse AI JSON response.")
+        completion = client.chat.completions.create(
+            model=AI_MODEL_NAME,
+            messages=[
+                {"role": "system", "content": "You are a structured summarization assistant."},
+                {"role": "user", "content": prompt}                
+            ],
+            temperature=AI_TEMPERATURE,
+        )
+        
+        content = completion.choices[0].message.content.strip()
+        
+        # Extract JSON block if extra text exists
+        json_match = re.search(r"\{.*\}", content, re.DOTALL)
+        if not json_match:
+            raise Exception("No valid JSON found in AI response.")
+        
+        try:
+            return json.loads(json_match.group())
+        except json.JSONDecodeError:
+            raise Exception("Failed to parse AI JSON response.")
+    except APITimeoutError:
+        raise Exception("AI Service timeout.")
