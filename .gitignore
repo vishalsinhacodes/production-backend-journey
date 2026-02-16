@@ -4,3 +4,4 @@ app/ai/__pycache__
 app/users/__pycache__
 .env
 .env.local
+.vscode/

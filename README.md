@@ -3,11 +3,6 @@
 Goal:
 To build production-ready backend systems with Docker, CI/CD, Cloud deployment and AI Integration.
 
-Week 1:
-
-- FastAPI basic app
-- Health endpoint
-
 ## Architecture Overview
 
 - FastAPI application (Dockerized)
