@@ -1,11 +1,16 @@
 import os
 import json
 import re
-from openai import OpenAI, APITimeoutError
-from dotenv import load_dotenv
+import logging
+import time
+
+from openai import OpenAI
+from fastapi import HTTPException
 
 
 from app.config import *
+
+logger = logging.getLogger(__name__)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 AI_MODEL_NAME = os.getenv("AI_MODEL_NAME", "llama-3.1-8b-instant")
@@ -17,10 +22,13 @@ if not GROQ_API_KEY:
 client = OpenAI(
     api_key=GROQ_API_KEY,
     base_url="https://api.groq.com/openai/v1",
-    timeout=10.0
+    timeout=10
 )
 
-def chat_with_ai(user_message: str) -> str:
+def chat_with_ai(user_message: str, request_id: str) -> str:
+    start_time = time.time()
+    logger.info(f"request_id={request_id} Chat LLM call started")
+    
     try:
         completion = client.chat.completions.create(
             model=AI_MODEL_NAME,
@@ -31,11 +39,21 @@ def chat_with_ai(user_message: str) -> str:
             temperature=AI_TEMPERATURE
         )
         
+        llm_duration = time.time() - start_time
+        logger.info(
+            f"request_id={request_id} "
+            f"Chat LLM call completed in {llm_duration:.2f}s"
+        )
+        
         return completion.choices[0].message.content
-    except APITimeoutError:
-        raise Exception("AI Service timeout.")
+    except Exception as e:
+        logger.error("LLM call timed out")
+        if "timeout" in str(e).lower():
+            raise HTTPException(status_code=504, detail="AI service timeout.")
+        raise HTTPException(status_code=500, detail="AI service error.")
+        
 
-def summarize_document(text: str) -> dict:
+def summarize_document(text: str, request_id: str) -> dict:
     prompt = f"""
     You are an AI assistant that summarizes documents.
     Return ONLY valid JSON in the following format:
@@ -48,6 +66,10 @@ def summarize_document(text: str) -> dict:
     Document:
     {text}
     """
+    
+    start_time = time.time()
+    logger.info(f"request_id={request_id} Summerize LLM call started")
+    
     try:
         completion = client.chat.completions.create(
             model=AI_MODEL_NAME,
@@ -56,6 +78,12 @@ def summarize_document(text: str) -> dict:
                 {"role": "user", "content": prompt}                
             ],
             temperature=AI_TEMPERATURE,
+        )
+        
+        llm_duration = time.time() - start_time
+        logger.info(
+            f"request_id={request_id} "
+            f"Summerize LLM call completed in {llm_duration:.2f}s"
         )
         
         content = completion.choices[0].message.content.strip()
@@ -69,5 +97,8 @@ def summarize_document(text: str) -> dict:
             return json.loads(json_match.group())
         except json.JSONDecodeError:
             raise Exception("Failed to parse AI JSON response.")
-    except APITimeoutError:
-        raise Exception("AI Service timeout.")
+    except Exception as e:
+        logger.error("LLM call timed out")
+        if "timeout" in str(e).lower():
+            raise HTTPException(status_code=504, detail="AI service timeout.")
+        raise HTTPException(status_code=500, detail="AI service error.")

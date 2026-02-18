@@ -42,7 +42,7 @@ def ai_chat(payload: ChatRequest, req: Request):
         )    
     
     try:
-        response = chat_with_ai(payload.message)
+        response = chat_with_ai(payload.message, req.state.request_id)
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -57,7 +57,7 @@ def summarize(payload: SummarizeRequest, req: Request):
         )
         
     try:
-        result = summarize_document(payload.text)
+        result = summarize_document(payload.text, req.state.request_id)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
